@@ -2,132 +2,60 @@ package main
 
 import (
 		"fmt"
-    "github.com/akamensky/argparse"
-    logger "github.com/sirupsen/logrus"
-    "github.com/spf13/viper"
     "os"
+    config "berttejeda/cheater/config"
+    lib "berttejeda/cheater/lib"
+    // commands "berttejeda/cheater/commands"
+    "github.com/alecthomas/kingpin/v2"
+    logger "github.com/sirupsen/logrus"
     // "strings"
     // "reflect"
-    "strconv"
 )
 
-type Search struct {
- Paths []string `mapstructure:"paths"`
- Filters []string `mapstructure:"filters"`
-}
-
-type Config struct {
- Search Search  `mapstructure:"search"`
-}
-
-func all(b ...any) bool {
-
-	if len(b) == 0 {
-		return false
-	} else if len(b) == 1 {
-	  switch v := b[0].(type) {
-	  	case string:
-	  	  bs0, err := strconv.ParseBool(b[0].(string))
-	  	  if err != nil {
-	  	  	return len(b[0].(string)) > 0 
-	  	  } else {
-	  	  	return bs0
-	  	  }
-	  	case int:
-	  		return b[0].(int) > 0
-	  	default:
-	  	  return v.(bool)
-	  }	
-	}
-
-  switch v := b[0].(type) {
-    case string:
-      bs0, err := strconv.ParseBool(b[0].(string))
-      if err != nil {
-      	return len(b[0].(string)) > 0 && all(b[1:]...)
-      } else {
-      	return bs0 && all(b[1:]...)
-      }
-    case int:
-      return b[0].(int) > 0 && all(b[1:]...)
-    default:
-      return v.(bool) && all(b[1:]...)
-  }		
-	
-}
+var (
+  app         = kingpin.New("bt-cheater", "Search through your markdown notes by keyword")
+  verbose     = app.Flag("verbose", "Enable verbose mode").Short('v').Bool()
+  debug       = app.Flag("debug", "Enable debug mode").Short('d').Bool()
+  jsonLogging = app.Flag("json-logging", "Enable json log format").Short('J').Bool()
+  find        = app.Command("find", "Retrieve cheat notes and display in terminal")
+  filters     = find.Flag("filters", "File extensions to math when searching").Short('f').Default("md", "txt").Strings()
+  paths       = find.Flag("paths", "File search paths").Short('p').Default(".").Strings()
+  topics      = find.Arg("args", "Topics to match").Strings()
+)
 
 func main() {
 
-	// Parse CLI Commands & Arguments
-	parser := argparse.NewParser("bt-cheater", "Display your markdown notes according to keywords")
-	
-	// Add global flag for debug logging
-	enableDebugLogging := parser.Flag("d", "debug", &argparse.Options{Required: false, Help: "Enable debug logging", Default: false})	
-	
-	// Add top level command `find`
-	findCmd := parser.NewCommand("find", "Retrieve cheat notes from specified cheatfiles according to keywords")
-	topics := findCmd.String("s", "session-path", &argparse.Options{Help: "Provide a session cookie file path"})
-	cheatFile := findCmd.String("c", "--cheat-file", &argparse.Options{Required: false, Help: "Manually specify cheat file(s) to search against"})
-	cheatFileSearchPaths := findCmd.String("p", "--cheat-file-search-paths", &argparse.Options{Required: false, Help: "Manually specify cheat file paths to search against"})
-	explodeTopics := findCmd.Flag("x", "explode-topics", &argparse.Options{Required: false, Help: "Write results to their own cheat files", Default: false})	
-	
-	// Pass our args to the parser
-	err := parser.Parse(os.Args)
-
-	// Handle argparse errors
-	if err != nil {
-	fmt.Print(parser.Usage(err))
-	os.Exit(1)
-
-	}	
+	cli := kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	// Enable Debug Logging if applicable
-	if *enableDebugLogging {
+	if *debug {
 		logger.SetLevel(logger.DebugLevel)
 	}
 
-	// Enable Debug Logging if applicable
-	logger.SetFormatter(&logger.JSONFormatter{})
-
-	// Config
-	viper.SetConfigName("cheater") // config file name without extension
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./")
-	viper.AddConfigPath("./config/") // config file path
-	viper.AutomaticEnv()             // read value ENV variable
-
-	err = viper.ReadInConfig()
+	config, err := config.Init()
 
 	if err != nil {
-	  logger.Warning("Config file: default \n", err)
-	  // os.Exit(1)
+	    logger.Error(err)
+	} 		
+
+	// Enable JSON Logging if applicable
+	if *jsonLogging {
+		logger.SetFormatter(&logger.JSONFormatter{})
 	}
 
-	var config Config
+  switch cli {
 
-	if err := viper.Unmarshal(&config); err != nil {
-  	fmt.Println(err)
-  	return
- 	}
+  // Find cheat notes
+  case find.FullCommand():
 
-	if findCmd.Happened() {
-
-		// fmt.Printf("%v", *parser.GetArgs()[0].GetParsed())
-
-		if *explodeTopics {
-			logger.Info(config.Search.Paths)
+		if *filters == nil {
+			fmt.Println("nil!")
 		}
+		
+  	kwargs := lib.InitKwargs(*topics).WithFileExtensions(*filters).WithSearchPaths(config.Search.Paths, *paths)
 
-		if len(*cheatFile) > 0 {
+    lib.ProcessCheatFiles(kwargs)
 
-		}
-
-		if len(*cheatFileSearchPaths) > 0 {
-
-		}
-		// for _, arg := range findCmd.GetArgs() {
-		// 	fmt.Println(arg)
-		// }		
-	}	
+	}
 
 }

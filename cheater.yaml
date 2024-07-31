@@ -1,6 +1,8 @@
 search:
   paths:
-    - C:\Users\tomtester\Documents\workspace\md
+    - ~/Documents/workspace/tmp
+    - ~/Documents/workspace/tmp2
+    - ~/Documents/workspace/tmp3
   filters:
     - md
     - txt
