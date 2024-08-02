@@ -31,11 +31,21 @@ func ArrayFormatEachItem(slice []string) []string {
     return slice
 }
 
-func ArrayContains(slice []string, item string) bool {
+func StringArrayContains(slice []string, item string) bool {
     for _, str := range slice {
-        if str == item {
-            return true
-        }
+      if str == item {
+          return true
+      }
+    }
+    return false
+}
+
+func IntArrayContains(slice []int, item int) bool {
+    
+    for _, int := range slice {
+      if int == item {
+          return true
+      }
     }
     return false
 }

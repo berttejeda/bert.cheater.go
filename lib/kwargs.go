@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	utils "berttejeda/cheater/utils"
 )
 
@@ -45,7 +44,6 @@ func (c *kwargs) WithSearchPaths(default_paths []string, paths []string) *kwargs
     }
 
     c.searchPaths = searchPaths
-    fmt.Println(searchPaths)
     return c
 }
 
