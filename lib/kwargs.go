@@ -10,17 +10,12 @@ type kwargs struct {
     searchPaths  []string
     fileExtensions []string
     // Optional
-    fizz, bazz int
+    pauseBetweenTopics bool
 }
 
 // Each optional attribute will have its own public method
-func (c *kwargs) WithFizz(fizz int) *kwargs {
-    c.fizz = fizz
-    return c
-}
-
-func (c *kwargs) WithBazz(bazz int) *kwargs {
-    c.bazz = bazz
+func (c *kwargs) WithPause(pauseBetweenTopics bool) *kwargs {
+    c.pauseBetweenTopics = pauseBetweenTopics
     return c
 }
 
@@ -50,7 +45,7 @@ func (c *kwargs) WithSearchPaths(default_paths []string, paths []string) *kwargs
 // This only accepts the required options as params
 func InitKwargs(topics []string) *kwargs {
     // First fill in the options with default values
-    return &kwargs{topics, []string{"."}, []string{".*"}, 10, 100}
+    return &kwargs{topics, []string{"."}, []string{".*"}, true}
 }
 
 func Do(c *kwargs) {}

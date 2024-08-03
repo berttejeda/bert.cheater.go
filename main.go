@@ -8,8 +8,6 @@ import (
     // commands "berttejeda/cheater/commands"
     "github.com/alecthomas/kingpin/v2"
     logger "github.com/sirupsen/logrus"
-    // "strings"
-    // "reflect"
 )
 
 var (
@@ -52,7 +50,7 @@ func main() {
 			fmt.Println("nil!")
 		}
 		
-  	kwargs := lib.InitKwargs(*topics).WithFileExtensions(*filters).WithSearchPaths(config.Search.Paths, *paths)
+  	kwargs := lib.InitKwargs(*topics).WithFileExtensions(*filters).WithSearchPaths(config.Search.Paths, *paths).WithPause(config.PauseBetweenTopics)
 
     lib.ProcessCheatFiles(kwargs)
 

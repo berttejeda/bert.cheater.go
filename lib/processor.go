@@ -2,7 +2,7 @@ package lib
 
 import (
 	utils "berttejeda/cheater/utils"
-	// "bufio"
+	"bufio"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -40,7 +40,7 @@ func readFileIntoMemory(filePath string) []string {
 
 	lines = strings.Split(string(content), "\n")
 
-	// Convert the byte slice to 
+	// Convert the byte slice to
 	// a string and return the result
 	return lines
 }
@@ -78,7 +78,7 @@ func getMatchedHeaderLineNumbers(lines []string, topicsPattern *regexp.Regexp) (
 	return matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, err
 }
 
-func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int) {
+func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int, kwargs *kwargs) {
 
 	linePrintMapArraySize := len(matchedHeaderLineNumbers)
 	linePrintMapArray := make([]linePrintMap, linePrintMapArraySize)
@@ -118,7 +118,14 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 			if !isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
 				fmt.Println(line)
 			}
+			if lineNumber == linePrintMap.UpperBoundary {
+				if kwargs.pauseBetweenTopics {
+					fmt.Println("ENTER => CONTINUE TO NEXT TOPIC or 'q' to quit")
+					bufio.NewReader(os.Stdin).ReadBytes('\n')
+				}
+			}
 		}
+
 	}
 
 }
@@ -176,7 +183,7 @@ func ProcessCheatFiles(kwargs *kwargs) {
 				logger.Debug(fmt.Sprintf("Found %s", path))
 				lines := readFileIntoMemory(path)
 				matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, _ = getMatchedHeaderLineNumbers(lines, topicsPattern)
-				printMatchedLines(lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers)
+				printMatchedLines(lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, kwargs)
 
 			}
 

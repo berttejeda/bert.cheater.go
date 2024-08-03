@@ -6,3 +6,4 @@ search:
   filters:
     - md
     - txt
+pause: true    

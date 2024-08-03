@@ -13,6 +13,7 @@ type Search struct {
 
 type Config struct {
  Search Search  `mapstructure:"search"`
+ PauseBetweenTopics bool `mapstructure:"pause"`
 }
 
 func Init() (Config, error) {
