@@ -3,6 +3,7 @@ package findCMD
 import (
 	appConfig "berttejeda/cheater/config"
 	"bufio"
+	color "github.com/fatih/color"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -86,6 +87,9 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 	var currHeaderLineNumberIndex int
 	var nextHeaderLineNumber int
 
+	headerColor := color.New(color.FgMagenta)
+	bodyColor := color.New(color.FgGreen)
+
 	// Build the Map of lines to be printed
 	for index, headerLineNumber := range matchedHeaderLineNumbers {
 		//nextIndex := index + 1
@@ -114,10 +118,10 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 		isHeader := headersPattern.MatchString(line)
 		for _, linePrintMap := range linePrintMapArray {
 			if isMatch && isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
-				fmt.Println(line)
+				headerColor.Println(line)
 			}
 			if !isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
-				fmt.Println(line)
+				bodyColor.Println(line)
 			}
 			if lineNumber == linePrintMap.UpperBoundary {
 				if config.PauseBetweenTopics {
