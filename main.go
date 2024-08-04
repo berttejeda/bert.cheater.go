@@ -4,8 +4,7 @@ import (
 		"fmt"
     "os"
     config "berttejeda/cheater/config"
-    lib "berttejeda/cheater/lib"
-    // commands "berttejeda/cheater/commands"
+    findCMD "berttejeda/cheater/commands/find"
     "github.com/alecthomas/kingpin/v2"
     logger "github.com/sirupsen/logrus"
 )
@@ -30,7 +29,7 @@ func main() {
 		logger.SetLevel(logger.DebugLevel)
 	}
 
-	config, err := config.Init()
+	options, err := config.InitOptions()
 
 	if err != nil {
 	    logger.Error(err)
@@ -50,9 +49,9 @@ func main() {
 			fmt.Println("nil!")
 		}
 		
-  	kwargs := lib.InitKwargs(*topics).WithFileExtensions(*filters).WithSearchPaths(config.Search.Paths, *paths).WithPause(config.PauseBetweenTopics)
+  	appConfig := config.InitConfig(*topics).WithFileExtensions(*filters).WithSearchPaths(options.Search.Paths, *paths).WithPause(options.PauseBetweenTopics)
 
-    lib.ProcessCheatFiles(kwargs)
+    findCMD.ProcessCheatFiles(appConfig)
 
 	}
 

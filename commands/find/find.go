@@ -1,7 +1,7 @@
-package lib
+package findCMD
 
 import (
-	utils "berttejeda/cheater/utils"
+	appConfig "berttejeda/cheater/config"
 	"bufio"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	utils "berttejeda/cheater/utils"
 )
 
 var headersPattern, err = regexp.Compile("^# ")
@@ -78,7 +79,7 @@ func getMatchedHeaderLineNumbers(lines []string, topicsPattern *regexp.Regexp) (
 	return matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, err
 }
 
-func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int, kwargs *kwargs) {
+func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int, config *appConfig.Config) {
 
 	linePrintMapArraySize := len(matchedHeaderLineNumbers)
 	linePrintMapArray := make([]linePrintMap, linePrintMapArraySize)
@@ -119,7 +120,7 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 				fmt.Println(line)
 			}
 			if lineNumber == linePrintMap.UpperBoundary {
-				if kwargs.pauseBetweenTopics {
+				if config.PauseBetweenTopics {
 					fmt.Println("ENTER => CONTINUE TO NEXT TOPIC or 'q' to quit")
 					bufio.NewReader(os.Stdin).ReadBytes('\n')
 				}
@@ -131,15 +132,15 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 }
 
 // Cheat file processor
-func ProcessCheatFiles(kwargs *kwargs) {
+func ProcessCheatFiles(config *appConfig.Config) {
 
-	fileExtensions := kwargs.fileExtensions
+	fileExtensions := config.FileExtensions
 
-	searchPaths := kwargs.searchPaths
+	searchPaths := config.SearchPaths
 
 	// Compile the regular expressions
 
-	topicStrings := kwargs.topics
+	topicStrings := config.Topics
 	var topicPermutationsMatrix [][]string
 	var topicPermutations []string
 	utils.ArrayPermute(topicStrings, 0, len(topicStrings)-1, &topicPermutationsMatrix)
@@ -183,7 +184,7 @@ func ProcessCheatFiles(kwargs *kwargs) {
 				logger.Debug(fmt.Sprintf("Found %s", path))
 				lines := readFileIntoMemory(path)
 				matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, _ = getMatchedHeaderLineNumbers(lines, topicsPattern)
-				printMatchedLines(lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, kwargs)
+				printMatchedLines(lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, config)
 
 			}
 
