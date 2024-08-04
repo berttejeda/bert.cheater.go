@@ -119,11 +119,10 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 		for _, linePrintMap := range linePrintMapArray {
 			if isMatch && isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
 				headerColor.Println(line)
-			}
-			if !isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
+			} else if !isHeader && lineNumber >= linePrintMap.LowerBoundary && lineNumber < linePrintMap.UpperBoundary {
 				bodyColor.Println(line)
 			}
-			if lineNumber == linePrintMap.UpperBoundary {
+			if lineNumber == linePrintMap.UpperBoundary && lineNumber != 1 {
 				if config.PauseBetweenTopics {
 					fmt.Println("ENTER => CONTINUE TO NEXT TOPIC or 'q' to quit")
 					reader := bufio.NewReader(os.Stdin)
