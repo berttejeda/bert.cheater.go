@@ -122,7 +122,18 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 			if lineNumber == linePrintMap.UpperBoundary {
 				if config.PauseBetweenTopics {
 					fmt.Println("ENTER => CONTINUE TO NEXT TOPIC or 'q' to quit")
-					bufio.NewReader(os.Stdin).ReadBytes('\n')
+					reader := bufio.NewReader(os.Stdin)
+					userInput, err := reader.ReadString('\n')
+					if err != nil {
+						fmt.Println("Error reading input:", err)
+						return
+					}
+
+					// Remove the newline character from the input
+					userInput = userInput[:len(userInput)-1]
+					if userInput == "q" {
+						os.Exit(0)
+					}
 				}
 			}
 		}
