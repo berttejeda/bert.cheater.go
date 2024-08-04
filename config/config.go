@@ -19,10 +19,12 @@ type Options struct {
 
 func InitOptions() (Options, error) {
 
-	viper.SetConfigName("cheater") // options file name without extension
+	viper.SetConfigName("config") // options file name without extension
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./")
-	viper.AddConfigPath("./options/") // options file path
+	configUserPath, _ := utils.FSOExpandUser("~/.bt-cheater")
+	viper.AddConfigPath(configUserPath) // options file path
+	viper.AddConfigPath("/etc/bt-cheater")
 	viper.AutomaticEnv()             // read value ENV variable
 
 	err := viper.ReadInConfig()
