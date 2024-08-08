@@ -80,7 +80,7 @@ func getMatchedHeaderLineNumbers(lines []string, topicsPattern *regexp.Regexp) (
 	return matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, err
 }
 
-func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int, config *appConfig.Config) {
+func printMatchedLines(cheatFile string, lines []string, matchedHeaderLineNumbers []int, allHeaderLineNumbers []int, allLineNumbers []int, config *appConfig.Config) {
 
 	linePrintMapArraySize := len(matchedHeaderLineNumbers)
 	linePrintMapArray := make([]linePrintMap, linePrintMapArraySize)
@@ -89,6 +89,10 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 
 	headerColor := color.New(color.FgMagenta)
 	bodyColor := color.New(color.FgGreen)
+
+	if len(matchedHeaderLineNumbers) > 0 {
+		logger.Info("Matched against", cheatFile)
+	}
 
 	// Build the Map of lines to be printed
 	for index, headerLineNumber := range matchedHeaderLineNumbers {
@@ -123,7 +127,7 @@ func printMatchedLines(lines []string, matchedHeaderLineNumbers []int, allHeader
 				bodyColor.Println(line)
 			}
 			if lineNumber == linePrintMap.UpperBoundary && lineNumber != 1 {
-				if config.PauseBetweenTopics {
+				if !config.NoPauseBetweenTopics {
 					fmt.Println("ENTER => CONTINUE TO NEXT TOPIC or 'q' to quit")
 					reader := bufio.NewReader(os.Stdin)
 					userInput, err := reader.ReadString('\n')
@@ -198,7 +202,7 @@ func ProcessCheatFiles(config *appConfig.Config) {
 				logger.Debug(fmt.Sprintf("Found %s", path))
 				lines := readFileIntoMemory(path)
 				matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, _ = getMatchedHeaderLineNumbers(lines, topicsPattern)
-				printMatchedLines(lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, config)
+				printMatchedLines(path, lines, matchedHeaderLineNumbers, allHeaderLineNumbers, allLineNumbers, config)
 
 			}
 

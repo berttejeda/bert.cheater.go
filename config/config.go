@@ -14,7 +14,8 @@ type Search struct {
 
 type Options struct {
  Search Search  `mapstructure:"search"`
- PauseBetweenTopics bool `mapstructure:"pause"`
+ NoPauseBetweenTopics bool `mapstructure:"pause"`
+ MatchAny bool `mapstructure:"any"`
 }
 
 func InitOptions() (Options, error) {
@@ -53,14 +54,21 @@ type Config struct {
     SearchPaths  []string
     FileExtensions []string
     // Optional
-    PauseBetweenTopics bool
+    NoPauseBetweenTopics bool
+    MatchAny bool
 }
 
 // Each optional attribute will have its own public method
-func (c *Config) WithPause(pauseBetweenTopics bool) *Config {
-    c.PauseBetweenTopics = pauseBetweenTopics
+func (c *Config) WithNoPause(NoPauseBetweenTopics bool) *Config {
+    c.NoPauseBetweenTopics = NoPauseBetweenTopics
     return c
 }
+
+func (c *Config) WithMatchAny(MatchAny bool) *Config {
+    c.MatchAny = MatchAny
+    return c
+}
+
 
 func (c *Config) WithFileExtensions(r []string) *Config {
     c.FileExtensions = r
@@ -88,5 +96,11 @@ func (c *Config) WithSearchPaths(default_paths []string, paths []string) *Config
 // This only accepts the required options as params
 func InitConfig(topics []string) *Config {
     // First fill in the options with default values
-    return &Config{topics, []string{"."}, []string{".*"}, true}
+    return &Config{
+    	Topics: topics,
+    	SearchPaths: []string{"."},
+    	FileExtensions: []string{".*"},
+    	NoPauseBetweenTopics: false, 
+    	MatchAny: false,
+    }
 }
